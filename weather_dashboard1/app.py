@@ -1,5 +1,6 @@
 """Home page.  Run:  streamlit run app.py"""
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
@@ -43,18 +44,7 @@ label = sel1.selectbox("Choose a weather variable", list(LABELS))
 all_dists = sorted(df["District"].unique())
 choice = sel2.selectbox("Choose a district", ["All districts"] + all_dists)
 key = LABELS[label]
-agg = df.groupby(["Date", "District"])[[f"{key}_blk", f"{key}_dst"]].mean().reset_index()
 shown = all_dists if choice == "All districts" else [choice]
-for col, dist in zip(st.columns(len(shown)), shown):
-    one = agg[agg["District"] == dist].melt(["Date", "District"], var_name="Source", value_name=label)
-    one["Source"] = one["Source"].map({f"{key}_blk": "Blocks (average)", f"{key}_dst": "District"})
-    fig = px.line(one, x="Date", y=label, color="Source", title=f"🏙️ {dist}",
-                  color_discrete_map={"Blocks (average)": "#7C3AED", "District": DIST_COLOR[dist]})
-    fig.update_layout(height=290 if choice == "All districts" else 380,
-                      legend=dict(orientation="h", y=-0.3, title=None),
-                      margin=dict(t=40, b=10, l=10, r=10), xaxis_title=None)
-    with col:
-        plot(fig)
 
 # ---- district-wise results (block vs district) ----
 step(f"📊 Results for {choice.lower() if choice == 'All districts' else choice}")
@@ -67,7 +57,7 @@ for dist in shown:
                  "Error (RMSE)": round(float(np.sqrt(((b - s) ** 2).mean())), 2),
                  "Bias (Block − District)": round(float((b - s).mean()), 2),
                  "Correlation": None if np.isnan(r) else round(float(r), 2)})
-res = __import__("pandas").DataFrame(rows)
+res = pd.DataFrame(rows)
 if choice != "All districts":
     r0 = rows[0]
     k1, k2, k3, k4 = st.columns(4)
@@ -84,5 +74,3 @@ if choice != "All districts":
     tip("Bars above 0 = that block runs <b>higher</b> than the district number; below 0 = <b>lower</b>.")
 else:
     st.dataframe(res, hide_index=True, width="stretch")
-tip("The two lines almost overlap – that means the district number follows the blocks well. "
-    "Open <b>Block vs District</b> to see where they do differ.")
