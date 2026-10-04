@@ -1,0 +1,17 @@
+BACKGROUND ONLY - 2 steps
+
+1) Upload background.py into your  utils/  folder (next to style.py and data_loader.py).
+
+2) Easiest (applies to ALL pages at once): open utils/style.py, find the function  inject_css()
+   and add these two lines at the very END of that function (indented like the rest of the function):
+
+       from utils.background import apply_background
+       apply_background()
+
+   If you prefer not to touch style.py, add this instead in app.py (and in each page file),
+   right after the line  inject_css():
+
+       from utils.background import apply_background
+       apply_background()
+
+Reboot the app. Nothing else changes.
