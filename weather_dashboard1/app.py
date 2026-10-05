@@ -1,4 +1,3 @@
-```python
 """Home page.  Run:  streamlit run app.py"""
 import plotly.express as px
 import streamlit as st
@@ -52,15 +51,3 @@ for col, dist in zip(st.columns(3), sorted(agg["District"].unique())):
         plot(fig)
 tip("The two lines almost overlap – that means the district number follows the blocks well. "
     "Open <b>Block vs District</b> to see where they do differ.")
-
-```
-
-streamlit>=1.50
-pandas
-plotly
-openpyxl
-matplotlibstreamlit>=1.35
-pandas>=2.0
-numpy>=1.24
-plotly>=5.18
-openpyxl>=3.1
