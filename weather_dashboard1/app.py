@@ -1,6 +1,5 @@
+```python
 """Home page.  Run:  streamlit run app.py"""
-import numpy as np
-import pandas as pd
 import plotly.express as px
 import streamlit as st
 
@@ -37,3 +36,31 @@ for col, (e, t, d, target, color) in zip(st.columns(5), cards):
             st.page_link(target, label="Open →")
         except Exception:
             pass
+
+step("👀 Quick look: one variable, one chart per district")
+label = st.selectbox("Choose a weather variable", list(LABELS))
+key = LABELS[label]
+agg = df.groupby(["Date", "District"])[[f"{key}_blk", f"{key}_dst"]].mean().reset_index()
+for col, dist in zip(st.columns(3), sorted(agg["District"].unique())):
+    one = agg[agg["District"] == dist].melt(["Date", "District"], var_name="Source", value_name=label)
+    one["Source"] = one["Source"].map({f"{key}_blk": "Blocks (average)", f"{key}_dst": "District"})
+    fig = px.line(one, x="Date", y=label, color="Source", title=f"🏙️ {dist}",
+                  color_discrete_map={"Blocks (average)": "#7C3AED", "District": DIST_COLOR[dist]})
+    fig.update_layout(height=290, legend=dict(orientation="h", y=-0.3, title=None),
+                      margin=dict(t=40, b=10, l=10, r=10), xaxis_title=None)
+    with col:
+        plot(fig)
+tip("The two lines almost overlap – that means the district number follows the blocks well. "
+    "Open <b>Block vs District</b> to see where they do differ.")
+
+```
+
+streamlit>=1.50
+pandas
+plotly
+openpyxl
+matplotlibstreamlit>=1.35
+pandas>=2.0
+numpy>=1.24
+plotly>=5.18
+openpyxl>=3.1
